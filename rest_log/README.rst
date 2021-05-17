@@ -9,7 +9,7 @@ REST Log
 
 .. |badge1| image:: https://img.shields.io/badge/maturity-Alpha-red.png
     :target: https://odoo-community.org/page/development-status
-    :alt: Alpha
+    :alt: Alphas
 .. |badge2| image:: https://img.shields.io/badge/licence-LGPL--3-blue.png
     :target: http://www.gnu.org/licenses/lgpl-3.0-standalone.html
     :alt: License: LGPL-3
@@ -23,7 +23,7 @@ REST Log
     :target: https://runbot.odoo-community.org/runbot/271/13.0
     :alt: Try me on Runbot
 
-|badge1| |badge2| |badge3| |badge4| |badge5| 
+|badge1| |badge2| |badge3| |badge4| |badge5|
 
 When exposing REST services is often useful to see what's happening
 especially in case of errors.
@@ -142,7 +142,7 @@ promote its widespread use.
 
 Current `maintainer <https://odoo-community.org/page/maintainer-role>`__:
 
-|maintainer-simahawk| 
+|maintainer-simahawk|
 
 This module is part of the `OCA/rest-framework <https://github.com/OCA/rest-framework/tree/13.0/rest_log>`_ project on GitHub.
 
