@@ -1,0 +1,2 @@
+odoo-addon-base_rest @ git+https://github.com/OCA/rest-framework@refs/pull/225/head#subdirectory=setup/base_rest
+odoo-addon-pydantic @ git+https://github.com/OCA/rest-framework@refs/pull/223/head#subdirectory=setup/pydantic
