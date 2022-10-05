@@ -9,7 +9,7 @@ import traceback
 from werkzeug.urls import url_encode, url_join
 
 from odoo import exceptions, registry
-from odoo.http import request
+from odoo.http import Response, request
 
 from odoo.addons.base_rest.http import JSONEncoder
 from odoo.addons.component.core import AbstractComponent
@@ -123,6 +123,15 @@ class BaseRESTService(AbstractComponent):
             params = dict(params or {}, args=args)
 
         result = kw.get("result")
+        # NB: ``result`` might be an object of class ``odoo.http.Response``,
+        # for example when you try to download a file. In this case, we need to
+        # handle it properly, without the assumption that ``result`` is a dict.
+        if isinstance(result, Response):
+            status_code = result.status_code
+            result = {"status_code": status_code}
+            state = "success" if status_code in range(200, 300) else "failed"
+        else:
+            state = "success" if result else "failed"
         error = kw.get("traceback")
         orig_exception = kw.get("orig_exception")
         exception_name = None
@@ -142,7 +151,7 @@ class BaseRESTService(AbstractComponent):
             "error": error,
             "exception_name": exception_name,
             "exception_message": exception_message,
-            "state": "success" if result else "failed",
+            "state": state,
         }
 
     def _log_call_in_db(self, env, _request, method_name, *args, params=None, **kw):
