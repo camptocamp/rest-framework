@@ -128,7 +128,7 @@ class BaseRESTService(AbstractComponent):
         # handle it properly, without the assumption that ``result`` is a dict.
         if isinstance(result, Response):
             status_code = result.status_code
-            result = {"status_code": status_code}
+            result = {"status": status_code, "headers": dict(result.headers)}
             state = "success" if status_code in range(200, 300) else "failed"
         else:
             state = "success" if result else "failed"
