@@ -122,6 +122,8 @@ class BaseRESTService(AbstractComponent):
         if args:
             params = dict(params or {}, args=args)
 
+        params = self._log_call_sanitize_params(params)
+
         result = kw.get("result")
         # NB: ``result`` might be an object of class ``odoo.http.Response``,
         # for example when you try to download a file. In this case, we need to
@@ -160,6 +162,11 @@ class BaseRESTService(AbstractComponent):
         if not values or enabled_states and values["state"] not in enabled_states:
             return
         return env["rest.log"].sudo().create(values)
+
+    def _log_call_sanitize_params(self, params):
+        if "password" in params:
+            params["password"] = "<redacted>"
+        return params
 
     def _db_logging_active(self, method_name):
         enabled = self._log_calls_in_db
