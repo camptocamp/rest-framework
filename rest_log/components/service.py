@@ -115,10 +115,7 @@ class BaseRESTService(AbstractComponent):
 
     def _log_call_in_db_values(self, _request, *args, params=None, **kw):
         httprequest = _request.httprequest
-        headers = dict(httprequest.headers)
-        for header_key in self._log_call_header_strip:
-            if header_key in headers:
-                headers[header_key] = "<redacted>"
+        headers = self._log_call_sanitize_headers(dict(httprequest.headers))
         if args:
             params = dict(params or {}, args=args)
 
@@ -130,7 +127,10 @@ class BaseRESTService(AbstractComponent):
         # handle it properly, without the assumption that ``result`` is a dict.
         if isinstance(result, Response):
             status_code = result.status_code
-            result = {"status": status_code, "headers": dict(result.headers)}
+            result = {
+                "status": status_code,
+                "headers": self._log_call_sanitize_headers(dict(result.headers)),
+            }
             state = "success" if status_code in range(200, 300) else "failed"
         else:
             state = "success" if result else "failed"
@@ -167,6 +167,12 @@ class BaseRESTService(AbstractComponent):
         if "password" in params:
             params["password"] = "<redacted>"
         return params
+
+    def _log_call_sanitize_headers(self, headers: dict):
+        for header_key in self._log_call_header_strip:
+            if header_key in headers:
+                headers[header_key] = "<redacted>"
+        return headers
 
     def _db_logging_active(self, method_name):
         enabled = self._log_calls_in_db
