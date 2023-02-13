@@ -8,17 +8,13 @@ import traceback
 
 from werkzeug.urls import url_encode, url_join
 
-from odoo import exceptions, registry
+from odoo import registry
 from odoo.http import Response, request
 
 from odoo.addons.base_rest.http import JSONEncoder
 from odoo.addons.component.core import AbstractComponent
 
-from ..exceptions import (
-    RESTServiceDispatchException,
-    RESTServiceUserErrorException,
-    RESTServiceValidationErrorException,
-)
+from ..exceptions import RESTServiceDispatchException, exception_map
 
 
 def json_dump(data):
@@ -36,31 +32,21 @@ class BaseRESTService(AbstractComponent):
             return super().dispatch(method_name, *args, params=params)
         return self._dispatch_with_db_logging(method_name, *args, params=params)
 
+    def _get_dispatch_with_db_logging_exception_map(self, method, *args, params=None):
+        return exception_map
+
     def _dispatch_with_db_logging(self, method_name, *args, params=None):
         # TODO: consider refactoring thi using a savepoint as described here
         # https://github.com/OCA/rest-framework/pull/106#pullrequestreview-582099258
         try:
             result = super().dispatch(method_name, *args, params=params)
-        except exceptions.UserError as orig_exception:
-            self._dispatch_exception(
-                method_name,
-                RESTServiceUserErrorException,
-                orig_exception,
-                *args,
-                params=params,
-            )
-        except exceptions.ValidationError as orig_exception:
-            self._dispatch_exception(
-                method_name,
-                RESTServiceValidationErrorException,
-                orig_exception,
-                *args,
-                params=params,
-            )
         except Exception as orig_exception:
-            self._dispatch_exception(
+            exc_map = self._get_dispatch_with_db_logging_exception_map(
+                method_name, *args, params=params
+            )
+            return self._dispatch_exception(
                 method_name,
-                RESTServiceDispatchException,
+                exc_map.get(type(orig_exception)) or RESTServiceDispatchException,
                 orig_exception,
                 *args,
                 params=params,
@@ -93,10 +79,16 @@ class BaseRESTService(AbstractComponent):
             log_entry_url = self._get_log_entry_url(log_entry)
         # UserError and alike have `name` attribute to store the msg
         exc_msg = self._get_exception_message(orig_exception)
-        raise exception_klass(exc_msg, log_entry_url) from orig_exception
+        exc = exception_klass(exc_msg, log_entry_url)
+        # Retrieve REST JSON info from original exception (if existing)
+        exc.rest_json_info.update(self._get_rest_json_info(orig_exception))
+        raise exc from orig_exception
 
     def _get_exception_message(self, exception):
         return getattr(exception, "name", str(exception))
+
+    def _get_rest_json_info(self, exception):
+        return getattr(exception, "rest_json_info", {})
 
     def _get_log_entry_url(self, entry):
         base_url = self.env["ir.config_parameter"].sudo().get_param("web.base.url")
