@@ -34,7 +34,7 @@ def authenticated_auth_api_key(
     except ValidationError as error:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=error.name,
+            detail=error.args,
             headers={"WWW-Authenticate": "HTTP-API-KEY"},
         ) from error
     # Ensure the api key is authorized for the current endpoint.
