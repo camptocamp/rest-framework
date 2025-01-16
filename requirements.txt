@@ -3,10 +3,12 @@ a2wsgi>=1.10.6
 apispec
 cerberus
 contextvars
+cryptography
 extendable>=0.0.4
 fastapi>=0.110.0
 parse-accept-language
 pydantic
+pyjwt
 pyquerystring
 python-multipart
 typing-extensions
