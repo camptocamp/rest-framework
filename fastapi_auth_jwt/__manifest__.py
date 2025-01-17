@@ -10,6 +10,7 @@
     "author": "ACSONE SA/NV,Odoo Community Association (OCA)",
     "maintainers": ["sbidoul"],
     "website": "https://github.com/OCA/rest-framework",
+    "external_dependencies": {"python": ["pyjwt", "cryptography"]},
     "depends": [
         "fastapi",
         "auth_jwt",
