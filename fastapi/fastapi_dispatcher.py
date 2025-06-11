@@ -115,5 +115,6 @@ class FastApiDispatcher(Dispatcher):
         token = odoo_env_ctx.set(env)
         try:
             yield
+            env.flush_all()
         finally:
             odoo_env_ctx.reset(token)
