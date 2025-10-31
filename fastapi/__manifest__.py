@@ -22,7 +22,7 @@
     "demo": ["demo/fastapi_endpoint_demo.xml"],
     "external_dependencies": {
         "python": [
-            "fastapi>=0.110.0",
+            "fastapi>=0.120.0",
             "python-multipart",
             "ujson",
             "a2wsgi>=1.10.6",
