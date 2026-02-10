@@ -39,6 +39,14 @@ class BaseRESTService(AbstractComponent):
     _log_calls_in_db = False
 
     def dispatch(self, method_name, *args, params=None):
+        if self._server_debug_logging_active(method_name):
+            _logger.debug(
+                "REST call: %s.%s with args: %s and params: %s",
+                self._collection._name,
+                method_name,
+                args,
+                params,
+            )
         if not self._db_logging_active(method_name):
             return super().dispatch(method_name, *args, params=params)
         return self._dispatch_with_db_logging(method_name, *args, params=params)
@@ -219,6 +227,11 @@ class BaseRESTService(AbstractComponent):
         if not enabled:
             enabled = bool(self._get_matching_active_conf(method_name))
         return request and enabled and self.env["rest.log"].logging_active()
+
+    def _server_debug_logging_active(self, method_name):
+        return self.env["rest.log"]._get_matching_conf_from_param(
+            "rest.log.fslogging", self._collection, self._usage, method_name
+        )
 
     def _get_matching_active_conf(self, method_name):
         return self.env["rest.log"]._get_matching_active_conf(
