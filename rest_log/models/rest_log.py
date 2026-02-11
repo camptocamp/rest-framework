@@ -185,7 +185,7 @@ class RESTLog(models.Model):
         conf = self._get_conf_from_param_value(config_param)
         return self._get_matching_conf(conf, collection, usage, method_name)
 
-    def _get_matching_conf(self, config_param, collection, usage, method_name):
+    def _get_matching_conf(self, conf, collection, usage, method_name):
         candidates = (
             collection + "." + usage + "." + method_name,
             collection + "." + usage,
