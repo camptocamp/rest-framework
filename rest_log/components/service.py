@@ -40,20 +40,12 @@ class BaseRESTService(AbstractComponent):
     _log_calls_in_db = False
 
     def dispatch(self, method_name, *args, params=None):
-        if self._server_debug_logging_active(method_name):
-            _logger.debug(
-                "REST call: %s.%s with args: %s and params: %s",
-                self._collection._name,
-                method_name,
-                args,
-                params,
-            )
+        call_name = f"{self._collection}.{self._usage}.{method_name}"
+        _logger.debug("REST call: %s", call_name)
         if not self._db_logging_active(method_name):
             return super().dispatch(method_name, *args, params=params)
         if self._start_profiling(method_name):
-            with Profiler(
-                description=f"REST LOG {self._collection}.{self._usage}.{method_name}",
-            ):
+            with Profiler(description=f"REST LOG {call_name}"):
                 return self._dispatch_with_db_logging(method_name, *args, params=params)
         return self._dispatch_with_db_logging(method_name, *args, params=params)
 
@@ -271,4 +263,10 @@ class BaseRESTService(AbstractComponent):
                 profiling_uid,
                 f"{self._collection}.{self._usage}.{method_name}",
             )
+            if not self.env["ir.profile"]._enabled_until():
+                _logger.warning(
+                    "Profiling globally disabled for this DB. "
+                    "Set a future date in the system parameter '%(param_name)s'.",
+                    {"param_name": "base.profiling_enabled_until"},
+                )
         return res
