@@ -157,7 +157,7 @@ class RESTLog(models.Model):
         config_param = self._get_log_active_param()
         return self._get_conf_from_param_value(config_param)
 
-    def _get_conf_from_param(self, param):
+    def _get_conf_from_param_value(self, param):
         conf = {}
         lines = [x.strip() for x in param.split(",") if x.strip()]
         for line in lines:
