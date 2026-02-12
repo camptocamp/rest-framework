@@ -43,11 +43,7 @@ class BaseRESTService(AbstractComponent):
         if not self._db_logging_active(method_name):
             return super().dispatch(method_name, *args, params=params)
         if self._start_profiling(method_name):
-            call_name = f"{self._collection}.{self._usage}.{method_name}"
-            with Profiler(
-                description=f"REST LOG {call_name} "
-                f"by {self.env.user.name} (uid={self.env.uid})"
-            ):
+            with self._profiling_get_profiler():
                 return self._dispatch_with_db_logging(method_name, *args, params=params)
         return self._dispatch_with_db_logging(method_name, *args, params=params)
 
@@ -267,4 +263,11 @@ class BaseRESTService(AbstractComponent):
     def _profiling_get_matching_conf(self, method_name):
         return self.env["rest.log"]._get_matching_conf_from_param(
             "rest.log.profiling.conf", self._collection, self._usage, method_name
+        )
+
+    def _profiling_get_profiler(self, method_name):
+        call_name = f"{self._collection}.{self._usage}.{method_name}"
+        return Profiler(
+            description=f"REST LOG {call_name}",
+            profile_session=f"{self.env.user.name} (uid={self.env.uid})",
         )

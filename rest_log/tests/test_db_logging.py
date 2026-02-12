@@ -304,3 +304,15 @@ class TestDBLogging(TransactionRestServiceRegistryCase, TestDBLoggingMixin):
             self.assertEqual(self.service._profiling_get_uids(), [])
             config_param.set_param("rest.log.profiling.uid", f"{self.env.uid}, 99999")
             self.assertEqual(self.service._profiling_get_uids(), [self.env.uid, 99999])
+
+    def test_get_profiler(self):
+        with self._get_mocked_request():
+            profiler = self.service._profiling_get_profiler("avg_endpoint")
+            self.assertEqual(
+                profiler.description,
+                f"REST LOG {self.service._collection}"
+                f".{self.service._usage}.avg_endpoint",
+            )
+            self.assertEqual(
+                profiler.profile_session, f"{self.env.user.name} (uid={self.env.uid})"
+            )
