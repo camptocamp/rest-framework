@@ -248,7 +248,7 @@ class BaseRESTService(AbstractComponent):
             param = (
                 self.env["ir.config_parameter"]
                 .sudo()
-                .get_param("rest.log.profiling.uid", "")
+                .get_param("rest.log.profiling.uids", "")
             )
             if not param.strip():
                 return []
