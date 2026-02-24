@@ -43,7 +43,7 @@ class BaseRESTService(AbstractComponent):
         if not self._db_logging_active(method_name):
             return super().dispatch(method_name, *args, params=params)
         if self._start_profiling(method_name):
-            with self._profiling_get_profiler():
+            with self._profiling_get_profiler(method_name):
                 return self._dispatch_with_db_logging(method_name, *args, params=params)
         return self._dispatch_with_db_logging(method_name, *args, params=params)
 
